@@ -12,9 +12,14 @@ class Drafter
     attr_reader :picker, :slot_counts
 
     def unfilled_positions
-      slot_counts.select do |position, count|
+      slot_counts.reject do |position, _|
+        picker.filled_slots.include?(position)
+      end.select do |position, count|
         valid_combinations.any? do |combination|
-          combination.count { |combo| combo[:slot] == position } < count
+          puts "evaluating combination for free positions: #{combination}"
+          combination.count do |combo|
+            combo[:slot] == position
+          end < count
         end
       end.keys
     end
@@ -25,17 +30,18 @@ class Drafter
 
         ids == ids.uniq
       end.reject do |combination|
+        puts "evaluation combination for validity: #{combination}"
         positions = combination.map { |combo| combo[:slot] }.uniq
 
         positions.any? do |position|
           combination.
-            count { |combo| combo[:slot] == position } > slot_counts[position]
+            count { |combo| combo[:slot] == position } > slot_counts.fetch(position, 0)
         end
       end
     end
 
     def all_combinations
-      collected_slot_options.combination(picker.picks.count).to_a
+      collected_slot_options.combination(picker.picks.count).to_a.uniq
     end
 
     def collected_slot_options

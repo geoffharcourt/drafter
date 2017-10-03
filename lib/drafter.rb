@@ -8,24 +8,32 @@ class Drafter
     @slot_counts = slot_counts
     @used_candidates = []
 
-    @results = Array.new(pickers) { Picker.new }
+    @results = Array.new(pickers) { Drafter::Picker.new }
   end
 
   def draft
     while candidates_remain? && round_can_be_filled?
-      results.each do |picker|
-        top_pick = best_remaining_candidate(picker)
-        picker.pick(top_pick)
-        used_candidates << top_pick
+      prior_used_candidates_count = used_candidates.count
+
+      results.each_with_index do |picker, index|
+        puts "."
+        puts "Team #{index + 1}"
+        puts "."
+        make_pick_for_picker(picker)
       end
 
+      break if prior_used_candidates_count == used_candidates.count
+
       if candidates_remain? && round_can_be_filled?
-        results.reverse.each do |picker|
-          top_pick = best_remaining_candidate(picker)
-          picker.pick(top_pick)
-          used_candidates << top_pick
+        results.reverse.each_with_index do |picker, index|
+          puts "."
+          puts "Team #{results.count - index}"
+          puts "."
+          make_pick_for_picker(picker)
         end
       end
+
+      break if prior_used_candidates_count == used_candidates.count
     end
 
     results
@@ -35,17 +43,35 @@ class Drafter
 
   attr_reader :candidates, :results, :slot_counts, :used_candidates
 
+  def make_pick_for_picker(picker)
+    top_pick = best_remaining_candidate(picker)
+
+    if top_pick
+      puts top_pick[:name]
+      picker.pick(top_pick)
+      used_candidates << top_pick
+    end
+  end
+
   def best_remaining_candidate(picker)
     possible_slots = slots_for_picker(picker)
+    filled_slots = slot_counts.keys - possible_slots
+    picker.mark_slots_filled(filled_slots)
 
-    candidates_who_fit = remaining_candidates.select do |candidate|
-      (candidate[:slots] & possible_slots).any?
-    end
+    puts "Possible slots: #{possible_slots.inspect}"
 
-    if candidates_who_fit.any?
-      candidates_who_fit.sort_by do |candidate|
-        candidate[:value]
-      end.reverse.first
+    if possible_slots.none?
+      nil
+    else
+      candidates_who_fit = remaining_candidates.select do |candidate|
+        (candidate[:slots] & possible_slots).any?
+      end
+
+      if candidates_who_fit.any?
+        candidates_who_fit.sort_by do |candidate|
+          candidate[:value]
+        end.reverse.first
+      end
     end
   end
 
