@@ -14,6 +14,12 @@ class Drafter::Picker
     @filled_slots = slots
   end
 
+  def players_at(position)
+    picks.count do |pick|
+      pick[:slots].include?(position)
+    end
+  end
+
   def to_a
     picks
   end
