@@ -1,11 +1,12 @@
 class Drafter::LineupPermutations
   attr_reader :single_option_assignments
 
-  def initialize(picker:, slot_counts:)
+  def initialize(picker:, slot_counts:, pitchers_only: false)
     @locked_positions = []
     @picker = picker
     @slot_counts = slot_counts
     @single_option_assignments = []
+    @pitchers_only = pitchers_only
   end
 
   def build
@@ -17,7 +18,7 @@ class Drafter::LineupPermutations
 
   private
 
-  attr_reader :locked_positions, :picker, :slot_counts
+  attr_reader :locked_positions, :picker, :pitchers_only, :slot_counts
 
   def cached_assignments
     picker.cached_assignments
@@ -35,8 +36,18 @@ class Drafter::LineupPermutations
     collected_slot_options.combination(picks_count).to_a.uniq
   end
 
+  def relevant_picks
+    if pitchers_only
+      picker.picks.select do |pick|
+        (pick[:slots] & [:p, :sp, :rp]).any?
+      end
+    else
+      picker.picks
+    end
+  end
+
   def collected_slot_options
-    picker.picks.flat_map do |pick|
+    relevant_picks.flat_map do |pick|
       cached_assignment = cached_assignments.detect do |assignment|
         assignment[:id] == pick[:id]
       end
@@ -62,7 +73,7 @@ class Drafter::LineupPermutations
             [assignment]
           end
         else
-          (pick[:slots] - positions_to_exclude).map do |slot|
+          (pick[:slots] - excludables).map do |slot|
             { id: pick[:id], slot: slot }
           end
         end
@@ -77,6 +88,6 @@ class Drafter::LineupPermutations
   end
 
   def picks_count
-    @_picks_count ||= picker.picks.length
+    @_picks_count ||= relevant_picks.length
   end
 end

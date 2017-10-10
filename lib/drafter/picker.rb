@@ -20,6 +20,12 @@ class Drafter::Picker
     picks << choice
   end
 
+  def players_at(slot)
+    picks.count do |pick|
+      pick[:slots].include?(slot)
+    end
+  end
+
   def to_a
     picks
   end
