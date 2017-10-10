@@ -1,3 +1,5 @@
+require "spec_helper"
+
 RSpec.describe Drafter::PotentialSlotsForPicker do
   it "returns positions that have no candidiates" do
     slot_counts = { "1b" => 1, "2b" => 1, "3b" => 1 }

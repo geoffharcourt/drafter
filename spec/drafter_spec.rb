@@ -9,7 +9,7 @@ RSpec.describe Drafter do
     drafter = Drafter.new(
       candidates: candidates,
       pickers: 3,
-      slot_counts: { "u" => 10 },
+      slot_counts: { u: 10 },
     )
 
     results = drafter.draft.map(&:picks)
@@ -18,47 +18,47 @@ RSpec.describe Drafter do
 
   it "distributes candidates among the pickers efficiently" do
     candidates = [
-      { id: "1st", value: 1000, slots: ["u"] },
-      { id: "2nd", value: 900, slots: ["u"] },
-      { id: "3rd", value: 800, slots: ["u"] },
-      { id: "4th", value: 700, slots: ["u"] },
-      { id: "5th", value: 600, slots: ["u"] },
-      { id: "6th", value: 500, slots: ["u"] },
+      { id: "1st", value: 1000, slots: [:u] },
+      { id: "2nd", value: 900, slots: [:u] },
+      { id: "3rd", value: 800, slots: [:u] },
+      { id: "4th", value: 700, slots: [:u] },
+      { id: "5th", value: 600, slots: [:u] },
+      { id: "6th", value: 500, slots: [:u] },
     ]
 
     drafter = Drafter.new(
       candidates: candidates,
       pickers: 3,
-      slot_counts: { "u" => 10 },
+      slot_counts: { u: 10 },
     )
 
     results = drafter.draft.map(&:picks)
     expect(results[0]).to match_array([
-      { id: "1st", value: 1000, slots: ["u"] },
-      { id: "6th", value: 500, slots: ["u"] },
+      { id: "1st", value: 1000, slots: [:u] },
+      { id: "6th", value: 500, slots: [:u] },
     ])
     expect(results[1]).to match_array([
-      { id: "2nd", value: 900, slots: ["u"] },
-      { id: "5th", value: 600, slots: ["u"] },
+      { id: "2nd", value: 900, slots: [:u] },
+      { id: "5th", value: 600, slots: [:u] },
     ])
     expect(results[2]).to match_array([
-      { id: "3rd", value: 800, slots: ["u"] },
-      { id: "4th", value: 700, slots: ["u"] },
+      { id: "3rd", value: 800, slots: [:u] },
+      { id: "4th", value: 700, slots: [:u] },
     ])
   end
 
   it "does not execute a round that cannot be filled" do
     candidates = [
-      { id: "1st", value: 1000, slots: ["u"] },
-      { id: "2nd", value: 900, slots: ["u"] },
-      { id: "3rd", value: 800, slots: ["u"] },
-      { id: "4th", value: 700, slots: ["u"] },
+      { id: "1st", value: 1000, slots: [:u] },
+      { id: "2nd", value: 900, slots: [:u] },
+      { id: "3rd", value: 800, slots: [:u] },
+      { id: "4th", value: 700, slots: [:u] },
     ]
 
     drafter = Drafter.new(
       candidates: candidates,
       pickers: 3,
-      slot_counts: { "u" => 10 },
+      slot_counts: { u: 10 },
     )
 
     results = drafter.draft.map(&:picks)
