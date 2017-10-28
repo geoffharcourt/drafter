@@ -1,9 +1,10 @@
 class Drafter::Picker
-  attr_reader :cached_assignments, :picks
+  attr_reader :cached_assignments, :disposition, :picks
 
-  def initialize
+  def initialize(disposition: 1.0)
     @picks = []
     @cached_assignments = []
+    @disposition = disposition
   end
 
   def cache_assignments(assignments)

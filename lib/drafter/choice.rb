@@ -11,7 +11,7 @@ class Drafter::Choice
       best_available_player
     else
       puts "Potential slots: #{potential_slots}:"
-      candidate = candidates.detect do |candidate|
+      candidate = weighted_candidates.detect do |candidate|
         candidate[:slots].any? do |slot|
           potential_slots.include?(slot)
         end
@@ -36,7 +36,7 @@ class Drafter::Choice
   end
 
   def best_available_player
-    @_best_available_player ||= candidates.first
+    @_best_available_player ||= weighted_candidates.first
   end
 
   def filled_slots
@@ -52,5 +52,15 @@ class Drafter::Choice
       picker: picker,
       slot_counts: slot_counts
     )
+  end
+
+  def weighted_candidates
+    @_weighted_candidates ||= candidates.sort_by do |candidate|
+      if candidate[:slots].include?(:u)
+        candidate[:value] * picker.disposition
+      else
+        candidate[:value]
+      end
+    end.reverse
   end
 end
