@@ -18,6 +18,22 @@ RSpec.describe Drafter::Choice do
 
         expect(choice.top_candidate[:id]).to eq(best[:id])
       end
+
+      it "respects the hitter-bias disposition" do
+        pitcher = { id: 1, value: 100, slots: [:sp] }
+        best_hitter = { id: 2, value: 90, slots: [:u] }
+        caddy = { id: 3, value: 80, slots: [:u] }
+        candidates = [pitcher, best_hitter, caddy]
+        picker = Drafter::Picker.new(disposition: 1.2)
+
+        choice = Drafter::Choice.new(
+          candidates: candidates,
+          picker: picker,
+          slot_counts: { sp: 1, u: 1 },
+        )
+
+        expect(choice.top_candidate[:id]).to eq(best_hitter[:id])
+      end
     end
 
     context "with a filled position" do

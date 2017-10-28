@@ -16,6 +16,20 @@ RSpec.describe Drafter do
     expect(results.count).to eq(3)
   end
 
+  it "assigns disposiitons evenly" do
+    candidates = []
+
+    drafter = Drafter.new(
+      candidates: candidates,
+      pickers: 5,
+      dispositions: [1.0, 1.1],
+      slot_counts: { u: 10 },
+    )
+
+    results = drafter.draft.map(&:disposition)
+    expect(results).to match_array([1.0, 1.0, 1.0, 1.1, 1.1])
+  end
+
   it "distributes candidates among the pickers efficiently" do
     candidates = [
       { id: "1st", value: 1000, slots: [:u] },
